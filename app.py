@@ -19,8 +19,8 @@ db_name = environ.get('DB_NAME', 'CHANGEME')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+db_user+':'+db_pass+'@'+db_host+'/'+db_name
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-student = environ.get('STUDENT', 'Default Student')
-college = environ.get('COLLEGE', 'Default College')
+student = environ.get('STUDENT', 'Bernardin')
+college = environ.get('COLLEGE', 'Algebra')
 
 db = SQLAlchemy(app)
 
