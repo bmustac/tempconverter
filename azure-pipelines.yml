@@ -1,28 +1,39 @@
-version: '3.7'
+trigger:
+- main
 
-services:
-  db:
-    image:  mysql:8.0
-    environment:
-      MYSQL_DATABASE: tempconverter
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
-    ports: 
-      - "3306:3306"
+variables:
+  # Container registry variables
+  ACR_NAME: 'vernievotazure'
+  ACR_LOGIN_SERVER: 'vernievotazure.azurecr.io'
+  IMAGE_NAME: 'tempconverter'
+  IMAGE_TAG: 'latest'
 
-  app:
-    image: github.com/bmustac/tempconverter
-    depends_on:
-      - db
-    environment:
-      DB_USER: user
-      DB_PASS: password
-      DB_HOST: db
-      DB_NAME: tempconverter
-      ports:
-      - "80:5000"
-      deploy:
-        replicas: 3
+stages:
+- stage: BuildAndPush
+  displayName: 'Build and Push Docker Image'
+  jobs:
+  - job: Build
+    displayName: 'Build Docker Image'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
 
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.x'
+        addToPath: true
 
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install dependencies'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: '$(ACR_NAME)'
+        repository: '$(IMAGE_NAME)'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(IMAGE_TAG)
