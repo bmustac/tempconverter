@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  db:
+    image:  mysql:8.0
+    enviroment:
+      MYSQL_DATABASE: tempconverter
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    ports: 
+      - "3306:3306"
+
+  app:
+    image: docker.io/vernievot/tempconverter:1.0.1
+    depends_on:
+      - db
+    enviroment:
+      DB_USER: user
+      DB_PASS: password
+      DB_HOST: db
+      DB_NAME: tempconverter
+      ports:
+      - "80:5000"
+      deploy:
+        replicas: 2
+
